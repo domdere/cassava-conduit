@@ -40,6 +40,7 @@ before_install:
     fi
 
 install:
+  - $CABAL install Cabal
   - $CABAL sandbox init
   - $CABAL install --dependencies-only --enable-tests --shadow-installed-packages
   - $CABAL configure -flib-Werror --enable-tests $MODE
