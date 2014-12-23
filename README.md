@@ -1,4 +1,4 @@
-# cassava-conduit [![Build Status](https://travis-ci.org/domdere/cassava-conduit.svg?branch=master)](https://travis-ci.org/domdere/cassava-conduit)
+# cassava-conduit [![Build Status](https://img.shields.io/travis/domdere/cassava-conduit.svg?style=flat)](https://travis-ci.org/domdere/cassava-conduit) [![Hackage](https://img.shields.io/hackage/v/cassava-conduit.svg?style=flat)](https://hackage.haskell.org/package/cassava-conduit)
 
 Conduit interface for cassava package
 
