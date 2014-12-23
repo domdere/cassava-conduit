@@ -33,7 +33,7 @@ library
                     ,   cassava                 == 0.4.*
                     ,   conduit                 == 1.2.*
                     ,   conduit-extra           == 1.1.*
-                    ,   mtl                     == 2.1.*
+                    ,   mtl                     == 2.2.*
 
     ghc-options:        -Wall
                         -fno-warn-unused-imports
