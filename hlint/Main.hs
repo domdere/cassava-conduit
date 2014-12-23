@@ -8,5 +8,5 @@ import System.Exit ( exitFailure )
 main :: IO ()
 main = do
     args <- getArgs
-    hlints <- hlint $ ["src", "--cpp-define=HLINT", "--cpp-ansi"] ++ args
+    hlints <- hlint $ ["src", "--cpp-define=HLINT", "--cpp-ansi", "-XNoImplicitPrelude"] ++ args
     unless (null hlints) exitFailure

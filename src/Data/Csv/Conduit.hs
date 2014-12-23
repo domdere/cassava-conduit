@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts #-}
 -------------------------------------------------------------------
 -- |
 -- Module       : Data.Csv.Conduit

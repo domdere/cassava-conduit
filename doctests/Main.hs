@@ -14,6 +14,7 @@ doctestOpts =
     ,   "-optP-include"
     ,   "-optPdist/build/autogen/cabal_macros.h"
     ,   "-hide-all-packages"
+    ,   "-XNoImplicitPrelude"
     ] ++ opts ++ map ("-package=" ++) deps
 
 -- the list of all file paths to search for source files
