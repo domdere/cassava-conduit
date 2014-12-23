@@ -41,7 +41,7 @@ before_install:
 
 install:
   - $CABAL sandbox init
-  - $CABAL install --dependencies-only --enable-tests
+  - $CABAL install --dependencies-only --enable-tests --shadow-installed-packages
   - $CABAL configure -flib-Werror --enable-tests $MODE
 
 script:
