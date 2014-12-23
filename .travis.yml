@@ -6,9 +6,9 @@ env:
   - GHCVER=7.8.1
   - GHCVER=head
 
-matrix:
-  allow_failures:
-    - env: GHCVER=head
+#matrix:
+#  allow_failures:
+#    - env: GHCVER=head
 
 before_install:
   # If $GHCVER is the one travis has, don't bother reinstalling it.
