@@ -26,3 +26,6 @@ internal/
 
 # liquid artifacts
 .liquid/
+
+# example data
+exampledata/
