@@ -86,10 +86,9 @@ showError (CsvParseError rem err)   = "Csv Parse Error: '" ++ err ++ "', remaini
 showError (IncrementalError err)    = "Csv Parse Error: '" ++ err ++ "'"
 
 main :: IO ()
-main = return ()
---main = do
---    res <- runEitherT $ bimapEitherT showError id $ runResourceT conduitPipeline
---    either putStrLn return res
+main = do
+    res <- runEitherT $ bimapEitherT showError id $ runResourceT conduitPipeline
+    either putStrLn return res
 
 -- helpers
 
