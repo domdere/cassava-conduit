@@ -1,5 +1,5 @@
 name:               cassava-conduit
-version:            0.0.1
+version:            0.1.0
 license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
@@ -8,12 +8,12 @@ copyright:          Copyright (C) 2014
 synopsis:           Conduit interface for cassava package
 category:           Data
 description:        Conduit interface for cassava package
-homepage:           https://github.com/domdere/cassava-conduit/issues
+homepage:           https://github.com/domdere/cassava-conduit
 bug-reports:        https://github.com/domdere/cassava-conduit/issues
 cabal-version:      >= 1.18
 build-type:         Custom
---extra-source-files: etc/CONTRIBUTORS,
---                    etc/CREDITS
+extra-source-files: README.md
+                ,   CHANGELOG.md
 
 source-repository       head
     type:               git
