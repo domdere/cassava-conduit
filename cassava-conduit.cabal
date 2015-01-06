@@ -8,6 +8,8 @@ copyright:          Copyright (C) 2014-2015 Dom De Re
 synopsis:           Conduit interface for cassava package
 category:           Data
 description:        Conduit interface for cassava package
+                    .
+                    PRs welcome.
 homepage:           https://github.com/domdere/cassava-conduit
 bug-reports:        https://github.com/domdere/cassava-conduit/issues
 cabal-version:      >= 1.18
