@@ -14,7 +14,9 @@ module Data.Csv.Conduit (
         CsvParseError(..)
     -- * Conduits
     ,   fromCsv
+    ,   fromCsvLiftError
     ,   fromNamedCsv
+    ,   fromNamedCsvLiftError
     ,   fromCsvStreamError
     ,   fromNamedCsvStreamError
     ,   toCsv
@@ -40,8 +42,16 @@ data CsvParseError =
 -- Streams parsed records, Errors are not received in the stream but instead after the pipeline is executed,
 -- If you want to handle errors as they come and resume, see `fromCsvStreamError`
 --
-fromCsv :: (Show a, Monad m, FromRecord a, MonadError CsvParseError m) => DecodeOptions -> HasHeader -> Conduit BS.ByteString m a
-fromCsv opts h = {-# SCC fromCsv_p #-} terminatingStreamParser $ decodeWith opts h
+fromCsv :: (FromRecord a, MonadError CsvParseError m) => DecodeOptions -> HasHeader -> Conduit BS.ByteString m a
+fromCsv = fromCsvLiftError id
+
+-- |
+-- Sometimes your pipeline will involve an error type other than `CsvParseError`, in which case if you provide
+-- a function to project it into your custom error type, you can use this instead of `fromCsv`
+--
+fromCsvLiftError :: (FromRecord a, MonadError e m) => (CsvParseError -> e) -> DecodeOptions -> HasHeader -> Conduit BS.ByteString m a
+fromCsvLiftError f opts h = {-# SCC fromCsvLiftError_p #-} terminatingStreamParser f $ decodeWith opts h
+
 
 -- |
 -- Parses an instance of `FromNamedRecord`, this conduit drops the Header
@@ -49,8 +59,15 @@ fromCsv opts h = {-# SCC fromCsv_p #-} terminatingStreamParser $ decodeWith opts
 -- Errors are not seen in the pipeline but rather at the end after executing the pipeline, if you want to handle the errors
 -- as they occur, try `fromNamedCsvStreamError` instead.
 --
-fromNamedCsv :: (Show a, Monad m, FromNamedRecord a, MonadError CsvParseError m) => DecodeOptions -> Conduit BS.ByteString m a
-fromNamedCsv opts = {-# SCC fromNamedCsv_p #-} terminatingStreamHeaderParser $ decodeByNameWith opts
+fromNamedCsv :: (FromNamedRecord a, MonadError CsvParseError m) => DecodeOptions -> Conduit BS.ByteString m a
+fromNamedCsv = fromNamedCsvLiftError id
+
+-- |
+-- Sometimes your pipeline will involve an error type other than `CsvParseError`, in which case if you provide
+-- a function to project it into your custom error type, you can use this instead of `fromCsv`
+--
+fromNamedCsvLiftError :: (FromNamedRecord a, MonadError e m) => (CsvParseError -> e) -> DecodeOptions -> Conduit BS.ByteString m a
+fromNamedCsvLiftError f opts = {-# SCC fromNamedCsv_p #-} terminatingStreamHeaderParser f $ decodeByNameWith opts
 
 -- |
 -- Same as `fromCsv` but allows for errors to be handled in the pipeline instead
@@ -88,35 +105,37 @@ streamParser (Many rs p) = do
 streamParser (Done rs) = mapM_ (yield . first IncrementalError) rs
 
 terminatingStreamHeaderParser
-    :: (Show a, Monad m, MonadError CsvParseError m)
-    => HeaderParser (Parser a)
+    :: (Monad m, MonadError e m)
+    => (CsvParseError -> e)
+    -> HeaderParser (Parser a)
     -> Conduit BS.ByteString m a
-terminatingStreamHeaderParser (FailH rest errMsg)   = {-# SCC terminatingStreamHeaderParser_FailH_p #-} mapM $ const $ throwError $ CsvParseError rest errMsg
-terminatingStreamHeaderParser (PartialH p)          = {-# SCC terminatingStreamHeaderParser_PartialH_p #-} await >>= maybe (return ()) (terminatingStreamHeaderParser . p)
-terminatingStreamHeaderParser (DoneH _ p)           = {-# SCC terminatingStreamHeaderParser_DoneH_p #-} terminatingStreamParser p
+terminatingStreamHeaderParser f (FailH rest errMsg)   = {-# SCC terminatingStreamHeaderParser_FailH_p #-} mapM $ const $ throwError $ f $ CsvParseError rest errMsg
+terminatingStreamHeaderParser f (PartialH p)          = {-# SCC terminatingStreamHeaderParser_PartialH_p #-} await >>= maybe (return ()) (terminatingStreamHeaderParser f . p)
+terminatingStreamHeaderParser f (DoneH _ p)           = {-# SCC terminatingStreamHeaderParser_DoneH_p #-} terminatingStreamParser f p
 
 terminatingStreamParser
-    :: (Show a, Monad m, MonadError CsvParseError m)
-    => Parser a
+    :: (Monad m, MonadError e m)
+    => (CsvParseError -> e)
+    -> Parser a
     -> Conduit BS.ByteString m a
-terminatingStreamParser (Fail rest errMsg) = {-# SCC terminatingStreamParser_Fail_p #-} mapM $ const $ throwError $ CsvParseError rest errMsg
-terminatingStreamParser (Many ers p) = {-# SCC terminatingStreamParser_Many_p #-}
+terminatingStreamParser f (Fail rest errMsg)    = {-# SCC terminatingStreamParser_Fail_p #-} mapM $ const $ throwError $ f $ CsvParseError rest errMsg
+terminatingStreamParser f (Many ers p)          = {-# SCC terminatingStreamParser_Many_p #-}
     let
-        errorHandler :: (Monad m, MonadError CsvParseError m) => String -> Conduit BS.ByteString m a
-        errorHandler = mapM . const . throwError . IncrementalError
+        errorHandler :: (Monad m, MonadError e m) => (CsvParseError -> e) -> String -> Conduit BS.ByteString m a
+        errorHandler f' = mapM . const . throwError . f' . IncrementalError
 
         safeResultHandler
-            :: (Show a, Monad m, MonadError CsvParseError m)
+            :: (Monad m)
             => (BS.ByteString -> Parser a)
             -> (Parser a -> Conduit BS.ByteString m a)
             -> [a]
             -> Conduit BS.ByteString m a
-        safeResultHandler p' f rs = do
+        safeResultHandler p' f' rs = do
             mapM_ yield rs
             -- wait for more..
-            await >>= maybe (return ()) (f . p')
+            await >>= maybe (return ()) (f' . p')
     in
         -- send the results down the stream..
-        either errorHandler (safeResultHandler p terminatingStreamParser) (sequence ers)
-terminatingStreamParser (Done rs) = {-# SCC terminatingStreamParser_Done_p #-} either (mapM . const . throwError . IncrementalError) (mapM_ yield) (sequence rs)
+        either (errorHandler f) (safeResultHandler p (terminatingStreamParser f)) (sequence ers)
+terminatingStreamParser f (Done rs) = {-# SCC terminatingStreamParser_Done_p #-} either (mapM . const . throwError . f . IncrementalError) (mapM_ yield) (sequence rs)
 
