@@ -41,5 +41,4 @@ module LocalPrelude (
     ) where
 
 import Prelude
-import Control.Applicative
 import Data.Word
