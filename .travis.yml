@@ -2,7 +2,10 @@ language: haskell
 
 env:
   - GHCVER=7.10.1
-  - GHCVER=head
+  - GHCVER=7.10.2
+
+    #I dont support HEAD
+#  - GHCVER=head
 
 #matrix:
 #  allow_failures:
