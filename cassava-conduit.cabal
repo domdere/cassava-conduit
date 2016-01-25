@@ -13,7 +13,7 @@ description:        Conduit interface for cassava package
 homepage:           https://github.com/domdere/cassava-conduit
 bug-reports:        https://github.com/domdere/cassava-conduit/issues
 cabal-version:      >= 1.18
-build-type:         Custom
+build-type:         Simple
 tested-with:        GHC == 7.10.1
                 ,   GHC == 7.10.2
 extra-source-files: README.md
