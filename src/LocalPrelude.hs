@@ -11,7 +11,7 @@
 module LocalPrelude (
     -- * Type Classes
         Functor(..)
-    ,   Applicative(..)
+    ,   A.Applicative(..)
     ,   Monad(..)
     ,   Num(..)
     ,   Show(..)
@@ -41,4 +41,5 @@ module LocalPrelude (
     ) where
 
 import Prelude
+import Control.Applicative as A
 import Data.Word
