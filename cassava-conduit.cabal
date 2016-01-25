@@ -1,5 +1,5 @@
 name:               cassava-conduit
-version:            0.2.2
+version:            0.3.0
 license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
@@ -38,6 +38,7 @@ library
                     ,   conduit                 == 1.2.*
                     ,   conduit-extra           == 1.1.*
                     ,   mtl                     == 2.2.*
+                    ,   text                    == 1.2.*
 
     ghc-options:        -Wall
 
