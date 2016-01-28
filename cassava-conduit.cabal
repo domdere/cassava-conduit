@@ -32,7 +32,7 @@ library
     build-depends:      base < 5 && >= 4
                     ,   containers
                     ,   array
-                    ,   bifunctors              == 5.*
+                    ,   bifunctors              >= 4.2           && < 6
                     ,   bytestring              == 0.10.*
                     ,   cassava                 == 0.4.*
                     ,   conduit                 == 1.2.*
