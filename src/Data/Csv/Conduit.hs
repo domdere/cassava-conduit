@@ -53,7 +53,9 @@ data CsvStreamHaltParseError = HaltingCsvParseError BS.ByteString T.Text -- ^ th
 -- they are usually problems restricted to individual records, and streaming can resume from the next record
 -- you just have to decide on something sensible to do with the per record errors.
 --
-data CsvStreamRecordParseError = CsvStreamRecordParseError T.Text deriving (Show, Eq) -- ^ The stringy error describing why this record could not be parsed.
+data CsvStreamRecordParseError =
+  CsvStreamRecordParseError T.Text -- ^ The stringy error describing why this record could not be parsed.
+  deriving (Show, Eq)
 
 -- |
 -- Streams parsed records, Errors are not received in the stream but instead after the pipeline is executed,
