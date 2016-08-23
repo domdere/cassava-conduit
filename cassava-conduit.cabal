@@ -56,7 +56,7 @@ test-suite              quickcheck
     main-is:            Main.hs
     hs-source-dirs:     quickcheck
     build-depends:      base                >= 4 && < 5
-                    ,   QuickCheck          == 2.8.*
+                    ,   QuickCheck          == 2.9.*
                     ,   cassava-conduit
 
 benchmark               benchmarks
