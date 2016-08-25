@@ -7,7 +7,6 @@ import Criterion.Main
     ,   nf
     ,   whnf
     )
-import Criterion.Types ( Pure )
 
 -- | An example function to benchmark...
 --
