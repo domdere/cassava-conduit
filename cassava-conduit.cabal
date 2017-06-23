@@ -63,7 +63,7 @@ test-suite              quickcheck
                       , cassava             == 0.5.*
                       , conduit             == 1.2.*
                       , conduit-extra       == 1.1.*
-                      , QuickCheck          == 2.9.*
+                      , QuickCheck          == 2.10.*
                       , text                == 1.2.*
                       , cassava-conduit
 
