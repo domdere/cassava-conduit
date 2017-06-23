@@ -1,3 +1,18 @@
+# 0.4.x
+
+## 0.3.5.1 -> 0.4.0.0
+
+`cassava` was bumped from `0.4.*` to `0.5.*`.
+
+There were some semantic changes going from cassava 0.4.* -> 0.5.*, see here
+
+But I don't think they muddle with any of the explicit cassava-conduit semantics:
+
+- `QuoteMinimal` semantics are not defined by `cassava-conduit`, so it will change behaviour, but 
+- `cassava-conduit` won't compensate for it (hence the bump from `0.3` to `0.4`).
+- It doesn't use `foldl'`
+- cassava-conduit doesn't use `encodeByNamedWith` so the `encIncludeHeader` flag shouldn't have any effect.
+
 # 0.3.x
 
 ## 0.2.2 -> 0.3.0
