@@ -59,19 +59,11 @@ $ cabal build
 ## Building the project
 
 ``` Shell
-make build
+./mafia build
 ```
 
 ## Running Unit Tests
 
 ``` Shell
-make test
+./mafia test
 ```
-
-## Running Benchmarks
-
-**After** running `cabal configure --enable-benchmarks` and `cabal build`, the following command will run the benchmarks:
-
-    cabal bench
-
-For newer versions of `cabal`, `cabal bench` will run a `cabal build` automatically if necessary..
