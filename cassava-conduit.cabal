@@ -34,7 +34,7 @@ library
                     ,   array
                     ,   bifunctors              >= 4.2           && < 6
                     ,   bytestring              == 0.10.*
-                    ,   cassava                 == 0.4.*
+                    ,   cassava                 == 0.5.*
                     ,   conduit                 == 1.2.*
                     ,   conduit-extra           == 1.1.*
                     ,   mtl                     == 2.2.*
@@ -60,7 +60,7 @@ test-suite              quickcheck
 
     build-depends:      base                >= 4 && < 5
                       , bytestring          == 0.10.*
-                      , cassava             == 0.4.*
+                      , cassava             == 0.5.*
                       , conduit             == 1.2.*
                       , conduit-extra       == 1.1.*
                       , QuickCheck          == 2.9.*
