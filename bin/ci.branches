@@ -1,0 +1,11 @@
+#!/bin/sh -eux
+
+ROOT_DIR=$(pwd) || exit $?
+
+cabal update
+
+git submodule init
+git submodule update
+
+./mafia build
+./mafia test

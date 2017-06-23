@@ -1,52 +1,45 @@
-language: haskell
+language: generic
 
-env:
-  - GHCVER=7.10.1 CABALINSTALL=1.22 CABALVER=1.22.4.0
-  - GHCVER=7.10.2 CABALINSTALL=1.22 CABALVER=1.22.7.0
+sudo: false
 
-    #I dont support HEAD
-#  - GHCVER=head
+git:
+  submodules: false
 
-#matrix:
-#  allow_failures:
-#    - env: GHCVER=head
+cache:
+  directories:
+    - $HOME/.mafia
+
+matrix:
+  include:
+  - env: GHCVER=7.10.2 CABALVER=1.24
+    addons:
+      apt:
+        sources:
+          - hvr-ghc
+        packages:
+          - ghc-7.10.2
+          - cabal-install-1.24
+  - env: GHCVER=8.0.2 CABALVER=1.24
+    addons:
+      apt:
+        sources:
+          - hvr-ghc
+        packages:
+          - ghc-8.0.2
+          - cabal-install-1.24
+  #allow-failures:
+  #  - env: GHCVER=head
+addons:
+  apt:
+    sources:
+      - hvr-ghc
+    packages:
+      - ghc-7.10.2
+      - libgmp-dev
 
 before_install:
-  # If $GHCVER is the one travis has, don't bother reinstalling it.
-  # We can also have faster builds by installing some libraries with
-  # `apt`. If it isn't, install the GHC we want from hvr's PPA along
-  # with cabal-1.22.
-  - |
-    if [ $GHCVER = `ghc --numeric-version` ]; then
-      # Try installing some of the build-deps with apt-get for speed.
-      travis/cabal-apt-install --enable-tests $MODE
-      export CABAL=cabal
-    else
-      # Install the GHC we want from hvr's PPA
-      travis_retry sudo add-apt-repository -y ppa:hvr/ghc
-      travis_retry sudo apt-get update
-      travis_retry sudo apt-get install cabal-install-$CABALINSTALL ghc-$GHCVER happy
-      export CABAL=cabal-$CABALINSTALL
-      export PATH=/opt/ghc/$GHCVER/bin:$PATH
-    fi
-  # Uncomment whenever hackage is down.
-  # - mkdir -p ~/.cabal && cp travis/config ~/.cabal/config && $CABAL update
-  - $CABAL update
-
-  # Update happy when building with GHC head
-  - |
-    if [ $GHCVER = "head" ] || [ $GHCVER = "7.8.1" ]; then
-      $CABAL install happy alex
-      export PATH=$HOME/.cabal/bin:$PATH
-    fi
-
-install:
-  - $CABAL install Cabal-${CABALVER}
-  - $CABAL sandbox init
-  - $CABAL install --dependencies-only --enable-tests --shadow-installed-packages
-  - $CABAL configure -flib-Werror --enable-tests $MODE
+  # ghc
+  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
 
 script:
-  - $CABAL build
-  - $CABAL test --show-details=always
-  # - scripts/stats
+  - bin/ci

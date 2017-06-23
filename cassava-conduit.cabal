@@ -4,7 +4,7 @@ license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2014-2016 Dom De Re
+copyright:          Copyright (C) 2014-2017 Dom De Re
 synopsis:           Conduit interface for cassava package
 category:           Data
 description:        Conduit interface for cassava package
