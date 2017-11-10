@@ -1,5 +1,5 @@
 name:               cassava-conduit
-version:            0.4.0.0
+version:            0.4.0.1
 license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
@@ -36,7 +36,7 @@ library
                     ,   bytestring              == 0.10.*
                     ,   cassava                 == 0.5.*
                     ,   conduit                 == 1.2.*
-                    ,   conduit-extra           == 1.1.*
+                    ,   conduit-extra           == 1.2.*
                     ,   mtl                     == 2.2.*
                     ,   text                    == 1.2.*
 
@@ -62,7 +62,7 @@ test-suite              quickcheck
                       , bytestring          == 0.10.*
                       , cassava             == 0.5.*
                       , conduit             == 1.2.*
-                      , conduit-extra       == 1.1.*
+                      , conduit-extra       == 1.2.*
                       , QuickCheck          == 2.10.*
                       , text                == 1.2.*
                       , cassava-conduit
