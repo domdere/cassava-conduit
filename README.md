@@ -67,3 +67,4 @@ $ cabal build
 ``` Shell
 ./mafia test
 ```
+
