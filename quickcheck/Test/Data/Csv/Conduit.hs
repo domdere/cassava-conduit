@@ -14,7 +14,7 @@ import Data.Csv.Conduit
 
 import qualified Data.ByteString as BS
 import Data.Csv (HasHeader(..), defaultDecodeOptions)
-import Data.Conduit (($$), (=$=))
+import Data.Conduit ((.|), runConduit)
 import Data.Conduit.List (sourceList, consume)
 import Data.Functor ((<$>))
 import Data.List (length)
@@ -44,10 +44,10 @@ parsesAllRows g =
   forAll (diceIt g) $ \(expectedRows, chunks) ->
     let
       result :: Either CsvParseError [[Int]]
-      result =
-            sourceList chunks
-        $$  fromCsv defaultDecodeOptions NoHeader
-        =$= consume
+      result = runConduit
+         $ sourceList chunks
+        .| fromCsv defaultDecodeOptions NoHeader
+        .| consume
     in (length <$> result) === pure expectedRows
 
 prop_parsesAllRowsWithNewline :: Property

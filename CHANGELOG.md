@@ -1,5 +1,10 @@
 # 0.4.x
 
+## 0.4.0.1 -> 0.4.0.2
+
+- Bumped `conduit` to `1.3.*` (from `1.2.*`)
+- The `conduit-extra` dep was unecessary
+
 ## 0.3.5.1 -> 0.4.0.0
 
 `cassava` was bumped from `0.4.*` to `0.5.*`.

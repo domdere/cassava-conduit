@@ -31,3 +31,6 @@ internal/
 exampledata/
 
 TAGS
+
+# stack working dir
+.stack-work/*
