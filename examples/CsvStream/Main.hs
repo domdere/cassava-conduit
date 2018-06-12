@@ -7,7 +7,7 @@ import Prelude ( Show(..), Eq(..), Num(..) , IO, String, (++), fromIntegral )
 import Control.Applicative ( Applicative(..) )
 import Control.Monad ( Monad(..) )
 import Control.Monad.Error.Class ( MonadError )
-import Control.Monad.Trans.Either ( bimapEitherT, runEitherT )
+import Control.Monad.Trans.Except ( withExceptT , runExceptT )
 import Control.Monad.Trans.Resource ( MonadResource, runResourceT )
 import qualified Data.ByteString.Char8 as BS
 import Data.Int ( Int )
@@ -19,6 +19,7 @@ import Data.Conduit.List ( map )
 import Data.Either ( either )
 import Data.Function ( ($), (.), id )
 import Data.Functor ( (<$>) )
+import qualified Data.Text as T
 import Data.Word ( Word8 )
 import System.IO ( putStrLn )
 
@@ -82,12 +83,12 @@ conduitPipeline :: (MonadError CsvParseError m, MonadResource m) => m ()
 conduitPipeline = sourceFile "../exampledata/sampleinput.psv" $$ fromCsv (decodeOpts $ fromIntegral $ ord '|') HasHeader =$= map processInput =$= toCsv (encodeOpts $ fromIntegral $ ord '|') =$= sinkFile "../exampledata/sampleoutput.psv"
 
 showError :: CsvParseError -> String
-showError (CsvParseError rem err)   = "Csv Parse Error: '" ++ err ++ "', remaining input: '" ++ BS.unpack rem ++ "'"
-showError (IncrementalError err)    = "Csv Parse Error: '" ++ err ++ "'"
+showError (CsvParseError rem err)   = "Csv Parse Error: '" ++ T.unpack err ++ "', remaining input: '" ++ BS.unpack rem ++ "'"
+showError (IncrementalError err)    = "Csv Parse Error: '" ++ T.unpack err ++ "'"
 
 main :: IO ()
 main = do
-    res <- runEitherT $ bimapEitherT showError id $ runResourceT conduitPipeline
+    res <- runResourceT . runExceptT . withExceptT showError $ conduitPipeline
     either putStrLn return res
 
 -- helpers
