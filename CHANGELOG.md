@@ -1,3 +1,7 @@
+# 0.6.x
+
+- `streamParser` and functions using it would swallow certain runaway errors. This is fixed.
+
 # 0.5.x
 
 ## 0.4.0.2 -> 0.5.0
