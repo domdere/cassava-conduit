@@ -121,7 +121,7 @@ streamParser f (Many rs p)          = {-# SCC streamParser_Many_p #-} do
   mapM_ (yield . first (CsvStreamRecordParseError . T.pack)) rs
   -- wait for more..
   more <- await
-  maybe (return ()) (streamParser f . p) more
+  streamParser f . p $ fromMaybe BS.empty more
 streamParser _ (Done rs)            = {-# SCC streamParser_Done_p #-} mapM_ (yield . first (CsvStreamRecordParseError . T.pack)) rs
 
 terminatingStreamHeaderParser
