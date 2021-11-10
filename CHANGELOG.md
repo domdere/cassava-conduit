@@ -1,4 +1,8 @@
-# 0.6.x
+# 0.6.1
+
+- Add `fromCsvStreamErrorNoThrow` and `fromNamedCsvStreamErrorNoThrow`, functions that also put halting errors on the conduit instead of throwing in `MonadError`.
+
+# 0.6.0
 
 - `streamParser` and functions using it would swallow certain runaway errors. This is fixed.
 

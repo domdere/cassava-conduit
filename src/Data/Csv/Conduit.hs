@@ -20,7 +20,9 @@ module Data.Csv.Conduit (
   , fromNamedCsv
   , fromNamedCsvLiftError
   , fromCsvStreamError
+  , fromCsvStreamErrorNoThrow
   , fromNamedCsvStreamError
+  , fromNamedCsvStreamErrorNoThrow
   , toCsv
   ) where
 
@@ -90,16 +92,28 @@ fromNamedCsvLiftError :: (FromNamedRecord a, MonadError e m) => (CsvParseError -
 fromNamedCsvLiftError f opts = {-# SCC fromNamedCsv_p #-} terminatingStreamHeaderParser f $ decodeByNameWith opts
 
 -- |
--- Same as `fromCsv` but allows for errors to be handled in the pipeline instead
+-- Same as 'fromCsv' but allows for errors to be handled in the pipeline instead
 --
 fromCsvStreamError :: (FromRecord a, MonadError e m) => DecodeOptions -> HasHeader -> (CsvStreamHaltParseError -> e) -> ConduitT BS.ByteString (Either CsvStreamRecordParseError a) m ()
 fromCsvStreamError opts h f = {-# SCC fromCsvStreamError_p #-} streamParser f $ decodeWith opts h
+
+-- |
+-- Same as 'fromCsvStreamError' but allows for halting errors to be handled by the pipeline as well.
+--
+fromCsvStreamErrorNoThrow :: (Monad m, FromRecord a) => DecodeOptions -> HasHeader -> ConduitT BS.ByteString (Either (Either CsvStreamHaltParseError CsvStreamRecordParseError) a) m ()
+fromCsvStreamErrorNoThrow opts h = {-# SCC fromCsvStreamErrorNoThrow_p #-} streamParserNoThrow $ decodeWith opts h
 
 -- |
 -- Like `fromNamedCsvStream` but allows for errors to be handled in the pipeline itself.
 --
 fromNamedCsvStreamError :: (FromNamedRecord a, MonadError e m) => DecodeOptions -> (CsvStreamHaltParseError -> e) -> ConduitT BS.ByteString (Either CsvStreamRecordParseError a) m ()
 fromNamedCsvStreamError opts f = {-# SCC fromCsvStreamError_p #-} streamHeaderParser f $ decodeByNameWith opts
+
+-- |
+-- Like `fromNamedCsvStreamErrorNoThrow` but allows for errors to be handled in the pipeline itself.
+--
+fromNamedCsvStreamErrorNoThrow :: (Monad m, FromNamedRecord a) => DecodeOptions -> ConduitT BS.ByteString (Either (Either CsvStreamHaltParseError CsvStreamRecordParseError) a) m ()
+fromNamedCsvStreamErrorNoThrow opts = {-# SCC fromCsvStreamErrorNoThrow_p #-} streamHeaderParserNoThrow $ decodeByNameWith opts
 
 -- |
 -- Streams from csv to text, does not create headers...
@@ -114,6 +128,11 @@ streamHeaderParser f (FailH rest errMsg)  = {-# SCC streamHeaderParser_FailH_p #
 streamHeaderParser f (PartialH p)         = {-# SCC streamHeaderParser_PartialH_p #-} await >>= maybe (return ()) (streamHeaderParser f . p)
 streamHeaderParser f (DoneH _ p)          = {-# SCC streamHeaderParser_DoneH_p #-} streamParser f p
 
+streamHeaderParserNoThrow :: (Monad m) => HeaderParser (Parser a) -> ConduitT BS.ByteString (Either (Either CsvStreamHaltParseError CsvStreamRecordParseError) a) m ()
+streamHeaderParserNoThrow (FailH rest errMsg)  = {-# SCC streamHeaderParserNoThrow_FailH_p #-} yield $ Left $ Left $ HaltingCsvParseError rest (T.pack errMsg)
+streamHeaderParserNoThrow (PartialH p)         = {-# SCC streamHeaderParserNoThrow_PartialH_p #-} await >>= maybe (return ()) (streamHeaderParserNoThrow . p)
+streamHeaderParserNoThrow (DoneH _ p)          = {-# SCC streamHeaderParserNoThrow_DoneH_p #-} streamParserNoThrow p
+
 streamParser :: (MonadError e m) => (CsvStreamHaltParseError -> e) -> Parser a -> ConduitT BS.ByteString (Either CsvStreamRecordParseError a) m ()
 streamParser f (Fail rest errMsg)   = {-# SCC streamParser_Fail_p #-} lift . throwError . f $ HaltingCsvParseError rest (T.pack errMsg)
 streamParser f (Many rs p)          = {-# SCC streamParser_Many_p #-} do
@@ -123,6 +142,16 @@ streamParser f (Many rs p)          = {-# SCC streamParser_Many_p #-} do
   more <- await
   streamParser f . p $ fromMaybe BS.empty more
 streamParser _ (Done rs)            = {-# SCC streamParser_Done_p #-} mapM_ (yield . first (CsvStreamRecordParseError . T.pack)) rs
+
+streamParserNoThrow :: (Monad m) => Parser a -> ConduitT BS.ByteString (Either (Either CsvStreamHaltParseError CsvStreamRecordParseError) a) m ()
+streamParserNoThrow (Fail rest errMsg)   = {-# SCC streamParserNoThrow_Fail_p #-} yield $ Left $ Left $ HaltingCsvParseError rest (T.pack errMsg)
+streamParserNoThrow (Many rs p)          = {-# SCC streamParserNoThrow_Many_p #-} do
+  -- send the results down the stream..
+  mapM_ (yield . first (Right . CsvStreamRecordParseError . T.pack)) rs
+  -- wait for more..
+  more <- await
+  streamParserNoThrow . p $ fromMaybe BS.empty more
+streamParserNoThrow (Done rs)            = {-# SCC streamParserNoThrow_Done_p #-} mapM_ (yield . first (Right . CsvStreamRecordParseError . T.pack)) rs
 
 terminatingStreamHeaderParser
   :: (Monad m, MonadError e m)
