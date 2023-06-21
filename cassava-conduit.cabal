@@ -1,5 +1,5 @@
 name:               cassava-conduit
-version:            0.6.3
+version:            0.6.4
 license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
@@ -30,9 +30,9 @@ library
     default-language:   Haskell2010
 
     build-depends:      base < 5 && >= 4
-                    ,   containers
-                    ,   array
-                    ,   bifunctors              >= 4.2           && < 6
+                    ,   containers              >= 0.5.10       && < 0.6
+                    ,   array                   >= 0.5.2        && < 0.6
+                    ,   bifunctors              >= 4.2          && < 6
                     ,   bytestring              == 0.11.*
                     ,   cassava                 == 0.5.*
                     ,   conduit                 == 1.3.*

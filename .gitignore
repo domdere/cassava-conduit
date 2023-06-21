@@ -19,6 +19,7 @@ cabal.sandbox.config
 
 # project build directory
 dist/
+dist-newstyle/
 
 # web artificats
 public/
